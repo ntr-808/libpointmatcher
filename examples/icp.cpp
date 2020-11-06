@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 
-typedef PointMatcher<float> PM;
+typedef PointMatcher<double> PM;
 typedef PM::DataPoints DP;
 typedef PM::Parameters Parameters;
 typedef PointMatcherSupport::CurrentBibliography CurrentBibliography;
@@ -111,24 +111,24 @@ int main(int argc, const char *argv[])
 		}
 		icp.loadFromYaml(ifs);
 	}
-	
-	
+
+
 	int cloudDimension = ref.getEuclideanDim();
-	
-	if (!(cloudDimension == 2 || cloudDimension == 3)) 
+
+	if (!(cloudDimension == 2 || cloudDimension == 3))
 	{
 		cerr << "Invalid input point clouds dimension" << endl;
 		exit(1);
 	}
 
-	
+
 
 	PM::TransformationParameters translation =
 			parseTranslation(initTranslation, cloudDimension);
 	PM::TransformationParameters rotation =
 			parseRotation(initRotation, cloudDimension);
 	PM::TransformationParameters initTransfo = translation*rotation;
-	
+
 	std::shared_ptr<PM::Transformation> rigidTrans;
 	rigidTrans = PM::get().REG(Transformation).create("RigidTransformation");
 
@@ -152,9 +152,9 @@ int main(int argc, const char *argv[])
 	icp.transformations.apply(data_out, T);
 
 	// Safe files to see the results
-	ref.save(outputBaseFile + "_ref.vtk");
-	data.save(outputBaseFile + "_data_in.vtk");
-	data_out.save(outputBaseFile + "_data_out.vtk");
+	// ref.save(outputBaseFile + "_ref.vtk");
+	// data.save(outputBaseFile + "_data_in.vtk");
+	data_out.save(outputBaseFile);
 	if(isTransfoSaved) {
 		ofstream transfoFile;
 		string initFileName = outputBaseFile + "_init_transfo.txt";
@@ -185,7 +185,7 @@ int main(int argc, const char *argv[])
 			cerr << "Unable to write the complete transformation file\n" << endl;
 		}
 	}
-	else 
+	else
 	{
 		if(isVerbose)
 			cout << "ICP transformation:" << endl << T << endl;
@@ -318,7 +318,7 @@ PM::TransformationParameters parseTranslation(string& translation,
 	std::replace( translation.begin(), translation.end(), ',', ' ');
 	std::replace( translation.begin(), translation.end(), ';', ' ');
 
-	float translationValues[3] = {0};
+	double translationValues[3] = {0};
 	stringstream translationStringStream(translation);
 	for( int i = 0; i < cloudDimension; i++) {
 		if(!(translationStringStream >> translationValues[i])) {
@@ -355,7 +355,7 @@ PM::TransformationParameters parseRotation(string &rotation,
 	std::replace( rotation.begin(), rotation.end(), ',', ' ');
 	std::replace( rotation.begin(), rotation.end(), ';', ' ');
 
-	float rotationMatrix[9] = {0};
+	double rotationMatrix[9] = {0};
 	stringstream rotationStringStream(rotation);
 	for( int i = 0; i < cloudDimension*cloudDimension; i++) {
 		if(!(rotationStringStream >> rotationMatrix[i])) {
