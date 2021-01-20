@@ -54,6 +54,7 @@ void listModules();
 int validateArgs(const int argc, const char *argv[],
 				 bool& isVerbose,
 				 bool& isTransfoSaved,
+				 bool& noOutput,
 				 string& configFile,
 				 string& outputBaseFile,
 				 string& initTranslation, string& initRotation);
@@ -75,11 +76,12 @@ int main(int argc, const char *argv[])
 {
 	bool isTransfoSaved = false;
 	bool isVerbose = false;
+	bool noOutput = true;
 	string configFile;
 	string outputBaseFile("test");
 	string initTranslation("0,0,0");
 	string initRotation("1,0,0;0,1,0;0,0,1");
-	const int ret = validateArgs(argc, argv, isVerbose, isTransfoSaved, configFile,
+	const int ret = validateArgs(argc, argv, isVerbose, isTransfoSaved, noOutput, configFile,
 								 outputBaseFile, initTranslation, initRotation);
 	if (ret != 0)
 	{
@@ -151,10 +153,13 @@ int main(int argc, const char *argv[])
 	DP data_out(initializedData);
 	icp.transformations.apply(data_out, T);
 
-	// Safe files to see the results
-	// ref.save(outputBaseFile + "_ref.vtk");
-	// data.save(outputBaseFile + "_data_in.vtk");
-	data_out.save(outputBaseFile);
+	if(!noOutput) {
+		// Safe files to see the results
+		// ref.save(outputBaseFile + "_ref.vtk");
+		// data.save(outputBaseFile + "_data_in.vtk");
+		data_out.save(outputBaseFile);
+	}
+
 	if(isTransfoSaved) {
 		ofstream transfoFile;
 		string initFileName = outputBaseFile + "_init_transfo.txt";
@@ -233,6 +238,7 @@ void listModules()
 int validateArgs(const int argc, const char *argv[],
 				 bool& isVerbose,
 				 bool& isTransfoSaved,
+				 bool& noOutput,
 				 string& configFile,
 				 string& outputBaseFile,
 				 string& initTranslation, string& initRotation)
@@ -281,6 +287,20 @@ int validateArgs(const int argc, const char *argv[],
 			}
 			else {
 				cerr << "Invalid value for parameter isTransfoSaved." << endl
+					 << "Value must be true or false or 1 or 0." << endl
+					 << "Default value will be used." << endl;
+			}
+		}
+		else if (opt == "--noOutput") {
+			if (strcmp(argv[i+1], "1") == 0 || strcmp(argv[i+1], "true") == 0) {
+				noOutput = true;
+			}
+			else if (strcmp(argv[i+1], "0") == 0
+					 || strcmp(argv[i+1],"false") == 0) {
+				noOutput = false;
+			}
+			else {
+				cerr << "Invalid value for parameter noOutput." << endl
 					 << "Value must be true or false or 1 or 0." << endl
 					 << "Default value will be used." << endl;
 			}
@@ -394,6 +414,7 @@ void usage(const char *argv[])
 	cerr << "-v,--verbose               Be more verbose (info logging to stdout)" << endl;
 	cerr << "--config YAML_CONFIG_FILE  Load the config from a YAML file (default: default parameters)" << endl;
 	cerr << "--output BASEFILENAME      Name of output files (default: test)" << endl;
+	cerr << "--noOutput BOOL            Whether to write output files (default: false)" << endl;
 	cerr << "--initTranslation [x,y,z]  Add an initial 3D translation before applying ICP (default: 0,0,0)" << endl;
 	cerr << "--initTranslation [x,y]    Add an initial 2D translation before applying ICP (default: 0,0)" << endl;
 	cerr << "--initRotation [r00,r01,r02,r10,r11,r12,r20,r21,r22]" << endl;
