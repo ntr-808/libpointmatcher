@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "TransformationCheckersImpl.h"
 #include "Functions.h"
-#include <boost/math/special_functions/fpclassify.hpp> 
+#include <boost/math/special_functions/fpclassify.hpp>
 
 using namespace std;
 using namespace PointMatcherSupport;
@@ -64,10 +64,10 @@ template<typename T>
 void TransformationCheckersImpl<T>::CounterTransformationChecker::check(const TransformationParameters& parameters, bool& iterate)
 {
 	this->conditionVariables(0)++;
-	
-	//std::cout << "Iter: " << this->conditionVariables(0) << " / " << this->limits(0) << std::endl;
+
+	std::cout << "Iter: " << this->conditionVariables(0) << " / " << this->limits(0) << std::endl;
 	//cerr << parameters << endl;
-	
+
 	if (this->conditionVariables(0) >= this->limits(0))
 	{
 		iterate = false;
@@ -91,7 +91,7 @@ TransformationCheckersImpl<T>::DifferentialTransformationChecker::DifferentialTr
 	this->limits.setZero(2);
 	this->limits(0) = minDiffRotErr;
 	this->limits(1) = minDiffTransErr;
-	
+
 	this->conditionVariableNames.push_back("Mean abs differential rot err");
 	this->conditionVariableNames.push_back("Mean abs differential trans err");
 	this->limitNames.push_back("Min differential rotation err");
@@ -103,10 +103,10 @@ template<typename T>
 void TransformationCheckersImpl<T>::DifferentialTransformationChecker::init(const TransformationParameters& parameters, bool& iterate)
 {
 	this->conditionVariables.setZero(2);
-	
+
 	rotations.clear();
 	translations.clear();
-	
+
 	if (parameters.rows() == 4)
 	{
 		rotations.push_back(Quaternion(Eigen::Matrix<T,3,3>(parameters.topLeftCorner(3,3))));
@@ -118,7 +118,7 @@ void TransformationCheckersImpl<T>::DifferentialTransformationChecker::init(cons
 		m.topLeftCorner(2,2) = parameters.topLeftCorner(2,2);
 		rotations.push_back(Quaternion(m));
 	}
-	
+
 	const unsigned int nbRows = parameters.rows()-1;
 	translations.push_back(parameters.topRightCorner(nbRows,1));
 }
@@ -127,11 +127,11 @@ template<typename T>
 void TransformationCheckersImpl<T>::DifferentialTransformationChecker::check(const TransformationParameters& parameters, bool& iterate)
 {
 	typedef typename PointMatcher<T>::ConvergenceError ConvergenceError;
-	
+
 	rotations.push_back(Quaternion(Eigen::Matrix<T,3,3>(parameters.topLeftCorner(3,3))));
 	const unsigned int nbRows = parameters.rows()-1;
 	translations.push_back(parameters.topRightCorner(nbRows,1));
-	
+
 	this->conditionVariables.setZero(2);
 	if(rotations.size() > smoothLength)
 	{
@@ -147,10 +147,10 @@ void TransformationCheckersImpl<T>::DifferentialTransformationChecker::check(con
 		if(this->conditionVariables(0) < this->limits(0) && this->conditionVariables(1) < this->limits(1))
 			iterate = false;
 	}
-	
-	//std::cout << "Abs Rotation: " << this->conditionVariables(0) << " / " << this->limits(0) << std::endl;
-	//std::cout << "Abs Translation: " << this->conditionVariables(1) << " / " << this->limits(1) << std::endl;
-	
+
+	std::cout << "Abs Rotation: " << this->conditionVariables(0) << " / " << this->limits(0) << std::endl;
+	std::cout << "Abs Translation: " << this->conditionVariables(1) << " / " << this->limits(1) << std::endl;
+
 	if (boost::math::isnan(this->conditionVariables(0)))
 		throw ConvergenceError("abs rotation norm not a number");
 	if (boost::math::isnan(this->conditionVariables(1)))
@@ -189,7 +189,7 @@ void TransformationCheckersImpl<T>::BoundTransformationChecker::init(const Trans
 		initialRotation2D = acos(parameters(0,0));
 	else
 		throw runtime_error("BoundTransformationChecker only works in 2D or 3D");
-		
+
 	const unsigned int nbRows = parameters.rows()-1;
 	initialTranslation = parameters.topRightCorner(nbRows,1);
 }
@@ -198,7 +198,7 @@ template<typename T>
 void TransformationCheckersImpl<T>::BoundTransformationChecker::check(const TransformationParameters& parameters, bool& iterate)
 {
 	typedef typename PointMatcher<T>::ConvergenceError ConvergenceError;
-	
+
 	if (parameters.rows() == 4)
 	{
 		const Quaternion currentRotation = Quaternion(Eigen::Matrix<T,3,3>(parameters.topLeftCorner(3,3)));

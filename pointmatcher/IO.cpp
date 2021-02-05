@@ -865,7 +865,7 @@ void PointMatcherIO<T>::saveCSV(const DataPoints& data, std::ostream& os)
 			os << ",";
 	}
 
-	os << std::setprecision(16);
+	// os << std::setprecision(16);
 
 	int n = 0;
 	for (size_t i = 0; i < data.descriptorLabels.size(); i++)

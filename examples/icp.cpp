@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 
-typedef PointMatcher<double> PM;
+typedef PointMatcher<float> PM;
 typedef PM::DataPoints DP;
 typedef PM::Parameters Parameters;
 typedef PointMatcherSupport::CurrentBibliography CurrentBibliography;
@@ -338,7 +338,7 @@ PM::TransformationParameters parseTranslation(string& translation,
 	std::replace( translation.begin(), translation.end(), ',', ' ');
 	std::replace( translation.begin(), translation.end(), ';', ' ');
 
-	double translationValues[3] = {0};
+	float translationValues[3] = {0};
 	stringstream translationStringStream(translation);
 	for( int i = 0; i < cloudDimension; i++) {
 		if(!(translationStringStream >> translationValues[i])) {
@@ -375,7 +375,7 @@ PM::TransformationParameters parseRotation(string &rotation,
 	std::replace( rotation.begin(), rotation.end(), ',', ' ');
 	std::replace( rotation.begin(), rotation.end(), ';', ' ');
 
-	double rotationMatrix[9] = {0};
+	float rotationMatrix[9] = {0};
 	stringstream rotationStringStream(rotation);
 	for( int i = 0; i < cloudDimension*cloudDimension; i++) {
 		if(!(rotationStringStream >> rotationMatrix[i])) {
